@@ -450,3 +450,13 @@ Operator FrameworkとSDK、Operatorの構築に使用するツールキットを
 
 ## C Role-Based Access Control (RBAC)
 
+Go-based/Helm/Ansible OperatorのどれでもOperator SDKはOperatorの実行にかかわるRBAC Manifestを作成する。
+
+- deploy/service_account.yaml
+  - 人を表すUserAccountにたいして、Kubernetes APIを利用するプログラムやシステムを表すのがServiceAccount。
+- deploy/role.yaml
+  - 「どのような操作ができるか」という権限を構成するもの。
+- deploy/role_binding.yaml
+  - Roleとあわせて「誰に権限を渡すか」を構成するもの。
+
+開発するOperatorによって必要となる権限はことなるため、それぞれで適切なRole/RoleBindingを設定する必要がある。
