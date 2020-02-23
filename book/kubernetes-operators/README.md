@@ -446,7 +446,21 @@ Operator FrameworkとSDK、Operatorの構築に使用するツールキットを
 
 ## A Running an Operator as a Deployment Inside a Cluster
 
+クラスタの外部でOperatorを稼働させるのはテストやデバッグでは便利だが、プロダクション環境のOperatorであればKubernetesのクラスタ内で実行した方が良い。
+
+
+
 ## B Custom Resource Validation
+
+新たなAPIを作成すると、Operator SKはCustom Resourceのスケルトンを作成する。このスケルトンはそのまま利用できる。
+
+スケルトンのCustom Resource DefinitionsはspecとstatusをどちらもObject Typeと定義しているため柔軟に利用できる。
+
+ただし、この場合はKubernetesでパラメータのValidationができない。
+
+必要に応じてspecを詳細化し、Validationが行えるようにする。
+
+
 
 ## C Role-Based Access Control (RBAC)
 
