@@ -75,39 +75,148 @@ Operatorを使うと、クラスタ管理者は管理コストを抑えつつKub
 
 #### Cluster Version Requirements 
 
+1.11～1.16でテストした。
+
+
+
 #### Authorization Requirements 
 
-#### Standard Tools and Techniques 
+Operatorをデプロイするにはクラスタ管理者レベル（通常はcluster-admin）なアカウントが必要。
+
+運用する際はRBACを適切に管理する必要がある。
+
+
+
+#### Standard Tools and Techniques
+
+Operatorは複雑なアプリケーションをKubernetes APIのfirst-class citizensにする。その意味は次の章の例で示す。
+
+
 
 #### Suggested Cluster Configurations 
 
+環境の準備
+
+
+
 #### Checking Your Cluster Version 
+
+クラスタバージョン確認
+
+`kubectl version`で確認できる。
+
+
 
 ### Running a Simple Operator 
 
+簡単なOperatorを動かしてみる。
+
+
+
 #### A Common Starting Point 
+
+etcdは、CoreOSにルーツを持つ分散KVS。現在はCNCFの支援を受けている。
+
+K8sのコアとなるデータストアであり、メンバの間でコンセンサスをとるためにRaftを使い信頼できるストレージを提供する。
+
+
+
+etcd OperatorはOperator Patternの紹介のための「Hello world」としてよく利用されるので、それに倣って説明に利用する。
+
+etcdの基本的な使用法の説明であれば難しくはないが、etcdクラスタのセットアップなどはetcd固有のノウハウが必要。
+
+etcd Operatorにはその方法が入っている。
+
+
 
 #### Fetching the etcd Operator Manifests 
 
-#### CRs: Custom API Endpoints 
+etcd Operatorの取得
+
+
+
+#### CRs: Custom API Endpoints
+
+CRDの適用。
+
+
 
 #### Who Am I: Defining an Operator Service Account 
 
+Operator用のServiceAccountの設定
+
+
+
 #### Deploying the etcd Operator 
+
+etcd OperatorのDeploymentの作成と適用
 
 #### Declaring an etcd Cluster 
 
+CRを作成して、etcd Clusterを作る。
+
+
+
 #### Exercising etcd 
+
+OperatorによってServiceとかも自動で作られる。
+
+動いていることがわかる。
+
+
 
 #### Scaling the etcd Cluster 
 
+CRを編集してetcd Clusterをスケールアップする。
+
+
+
 #### Failure and Automated Recovery 
+
+etcdの特定のメンバが障害になったとき、etcdのオペレーター（人）にはメンバの障害を確認し、あたらしいメンバを追加し、
+
+etcdクラスタの残りのメンバと協業できるようにする作業が必要。
+
+etcd Operatorも同じく、内部状態を常に監視し、回復作業を行う。
+
+Eventなどにログを出力することができる。
+
+
 
 #### Upgrading etcd Clusters 
 
+3.1.10のetcdから更新してみる。
+
+
+
+Upgrading the hard wayだと下記のような作業が必要になる。
+
+- 各メンバのhealth checkとversionの確認
+- クラスタのスナップショットを作成する
+- メンバを1つだけ停止し、新しいバージョン（3.2.13）に変更し起動する。
+- 他のメンバにも同じ作業をする。
+
+easy wayであれば、etcd OperatorのImageを変更するだけであり、あとはOperatorが実施してくれる。
+
+
+
 #### Cleaning Up 
 
+お掃除。
+
+
+
 ### Summary 
+
+CRはアプリのバージョンや構成などの望ましい状態を規定し、Custom ControllerはResourceを監視し、クラスタの中で
+
+望ましい状態が維持される。
+
+Operator FrameworkとSDK、Operatorの構築に使用するツールキットを紹介する前に、
+
+まずはOperatorを構成するためのKubernetes APIの紹介をする。
+
+
 
 ## 3. Operators at the Kubernetes Interface
 
