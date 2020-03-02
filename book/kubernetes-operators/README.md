@@ -220,31 +220,72 @@ Operator FrameworkとSDK、Operatorの構築に使用するツールキットを
 
 ## 3. Operators at the Kubernetes Interface
 
+Operatorは2つのキーコンセプト（Resources, Controllers）を拡張する。
+Kubernetes APIには、新しいリソースを定義するためのメカニズムであるCustom Resource Definitionsがある。
+
 ### Standard Scaling: The ReplicaSet Resource 
+ReplicaSet ControllerはReplicaSetを作成し、それらを継続的に監視する。
+ReplicaSet Controllerが実行する操作は、アプリケーションに依存しない。
 
 ### Custom Resources 
+ユーザはCustomResourceDefinitionを定義することで、実行中のクラスタでCustomResourceを利用できるようになる。
+CustomResourceDefinitionはCustomResourceのスキーマのようなもので、CustomResourceのフィールドやそのフィールドに含まれる値の型を定義することができる。
 
 #### CR or ConfigMap? 
+ConfigMapはクラスタ状のPod内のコンテナで実行されているプログラムの設定を構成することに適している。
+通常アプリケーションは、Kubernetes APIからではなく、ファイルや環境変数の値としてコンテナから情報を取得しようとする。
+CustomResourceはkubectlなどのクライアントから作成およびアクセスすることができ、`.spec`や`.status`などのKubernetesの規則に従う。
 
 ### Custom Controllers 
+CustomResourceを作成することで、Kubernetes APIからアクセスすることができるようになるが、
+CustomResourceはデータを表現しているだけであるため、実際に処理をおこなうコンポーネントが必要となる。
+その役割を負うのがCustomControllerである。
 
 ### Operator Scopes 
+Operatorの適用範囲は、特定のNamespaceに制限することもクラスタ全体に適用することもできる。
 
 #### Namespace Scope 
+通常は単一のNamespaceに制限した方が良い。
+複数のチームが使用するクラスタなどではより顕著。
 
 #### Cluster-Scoped Operators 
+ServiceMeshを提供するIstioやTLS証明書を管理するcert-managerのようなOperatorはクラスタ全体の状態を監視及び操作するため、
+クラスタ全体に適用することが多い。
+NamespacedなOperatorはRole/RoleBindingにより操作の権限を割り当て、Cluster ScopeなOperatorはClusterRole/ClusterRoleBindingによって
+権限を付与する。
 
 ### Authorization 
+KubernetesではいくつかのAuthorizationの仕組みがあるが、RBACが推奨されている。
 
 #### Service Accounts 
+Kubernetesでは開発者などの人を表すアカウントはクラスタが管理しておらず、それらを表すAPIリソースはない。
+一方でServiceAccountはKubernetesによって管理され、APIを介して作成および操作ができる。
 
 #### Roles 
 
+Roleはなにができるかを記載したもの。
+
 #### RoleBindings 
+
+RoleBindingは誰にRoleをアタッチするか記載したもの。
+
+NamespacedなOperatorを適用するときは、適切なRoleをOperatorのServiceAccountにRoleBindingする必要がある。
+
+
 
 #### ClusterRoles and ClusterRoleBindings 
 
+Namespace内に制限されるRole/RoleBindingに対して、クラスタ全体に適用されるのがClusterRoleとClusterRoleBindingsである。
+
+クラスタ全体に適用する必要なあるOperatorには、適切なClusterRole/ClusterRoleBindingをアタッチする必要がある。
+
+
+
 ### Summary 
+
+OperatorはKubernetesのコアコンセプトにのっとり作成されるため、アプリケーションを「Kubernetes Native」なものにすることができる。
+
+
 
 ## 4. The Operator Framework
 
@@ -436,13 +477,52 @@ Operator FrameworkとSDK、Operatorの構築に使用するツールキットを
 
 ## 10. Getting Involved
 
+Operator Frameworkは発展途上。バグレポートを出すだけの簡単なところからコントリビュートする開発者になるまで、さまざまな方法で貢献することができる。
+
+GoogleのSIGがあるので入ると良い。
+
+
+
 ### Feature Requests and Reporting Bugs 
+
+バグを提出する際は下記を意識するとよい。
+
+- 具体的にすること
+  - 利用したバージョン
+  - 環境
+  - 再現手順
+- 1つずつバグを報告すること
+  - 複数のバグの場合だとトリアージが大変
+- 該当プロジェクトを選択すること
+  - 特定のプロジェクトに問題が発生する場合は、そのリポジトリに報告すること
+- 既存のIssueがあればそれを利用すること
+  - もしバグが継続的に発生していた場合は、そのissueを再オープンして利用する
+
+
 
 ### Contributing 
 
+もしコードが書けるなら、コントリビュートももちろん歓迎する。
+
+開発者ガイドも用意しているので、そこを参照する。
+
+
+
 ### Sharing Operators 
 
+OperatorHub.ioはコミュニティ作成のOperatorのホスティングサイト。
+
+OperatorHub.ioはCSVも確認できるので、適切なメタフィールドが適用されているかの確認もできる。
+
 ### Summary 
+
+メーリングリストへの参加やバグ報告、新機能のためのコード提供までさまざまなコミュニティの活動によって
+
+Operator Frameworkは成長し続けている。
+
+OperatorHub.ioへの貢献は、Operator促進にも役立つ。
+
+
 
 ## A Running an Operator as a Deployment Inside a Cluster
 
