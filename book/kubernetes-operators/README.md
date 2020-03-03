@@ -289,21 +289,111 @@ OperatorはKubernetesのコアコンセプトにのっとり作成されるた�
 
 ## 4. The Operator Framework
 
+Operatorの開発や配布、および運用管理には避けられない複雑さがある
+
+そのサポートを行うのがOperator Frameworkである。
+
+Operator SDKによりOperatorを開発し、
+
+Operator Lifecycle ManagerによりOperatorの管理を行い、
+
+Operator MeteringによってOperatorのメトリクスを監視することができる。
+
+
+
 ### Operator Framework Origins 
+
+Operator SDKはKubernetesのcontroller-runtimeをベースにしている。
+
+Operator Frameworkの一部としてOperator SDKによって作成されたOperatorはOLMによって管理され、
+
+OMによってメトリックスを管理される。
+
+Operator Frameworkはオープンソースであり、ベンダー中立であるCNCFに寄贈されている。
+
+
 
 ### Operator Maturity Model 
 
+Operatorには成熟度モデルがある。
+
+- Phase1 Basic Install
+
+  - アプリケーションのインストールや設定を行う
+
+- Phase2 Seamless Upgrades
+
+  - アプリケーションのパッチあてやバージョンアップを行うことができる
+
+- Phase3 Full Lifecycle
+
+  - ストレージのバックアップ、障害復旧などを自動で行うことができる
+
+- Phase4 Deep Insights
+
+  - MetricsやAlert、分析の機能をもっている
+
+- Phase5 Auto Pilot
+
+  - 水平/垂直分散や自動設定、異常検知などの機能をもっている
+
+  
+
 ### Operator SDK 
+
+Operator SDKはOperatorのコーディングをするためのツールである。
+
+SDKには現状Goによるサポートが含まれており、他の言語による開発も計画されている。
+
+また、SDKはHelmチャートやAnsible Playbook用のAdapterも提供する。
+
+
 
 #### Installing the Operator SDK Tool 
 
+Operator SDKによって、プロジェクトのひな形やGoのスケルトンコードを作成することができる。
+
+YAMLのマニフェストも生成することができる。
+
+バイナリをダウンロードし、PATHに通すかソースをビルドする。
+
+
+
 ### Operator Lifecycle Manager 
+
+Operatorがアプリケーションを管理するが、そのOperatorを管理する仕組みがOperator Lifecycle Managerである。
+
+OLMはOperatorとその依存関係を管理するためにClusterServiceVersionと呼ばれるmetadataを定義する。
+
+CSVありのOperatorはOLMで使用できるカタログのエントリとしてリストされる。
+
+そのあとにユーザはCatalogからOperatorをSubscribheして利用する。
+
+OperatorのCSVをもとにOLMはOperatorを管理する。
+
+
 
 ### Operator Metering 
 
+Operator MeteringはKubernetesで実行されるOperatorのリソース使用量を分析するためのシステムである。
+
+OMはKubernetesのCPU/Memoryその他のリソースMetricsを分析してコストを計算する。
+
+
+
 ### Summary 
 
+Operator Frameworkは以下の3つの要素から構成される。
+
+- Operatorを開発するためのOperator SDK
+- Operatorをクラスタ上で管理するためのOperator Lifecycle Manager
+- Operatorのパフォーマンスやリソース消費を測定するためのOperator Metering
+
+
+
 ## 5. Sample Application: Visitors Site
+
+（サンプルアプリケーションの説明のため割愛）
 
 ### Application Overview 
 
@@ -322,6 +412,8 @@ OperatorはKubernetesのコアコンセプトにのっとり作成されるた�
 ### Cleaning Up 
 
 ### Summary 
+
+
 
 ## 6. Adapter Operators
 
@@ -455,17 +547,71 @@ OperatorはKubernetesのコアコンセプトにのっとり作成されるた�
 
 ## 9. Operator Philosophy
 
+Operatorの考え方はSREからきている。
+
+
+
 ### SRE for Every Application 
+
+SREは展開、運用、および保守タスクを自動化するためのコードを各。SREは他のシステムを実行するためのソフトウェアを作成し、
+
+それを実行し、長期にわたって管理する。SREは、自動化を中心とする幅広いエンジリアにンぐ手法である。
+
+Operator成熟度モデルではAuto Pilotに該当する。
+
+
 
 ### Toil Not, Neither Spin 
 
+SREはシステム運用のために必要な作業を自動化することにより、労力を減らす。
+
+Toilは「自動化可能で、戦術的で、永続的な価値がなく、サービスの成長に比例して拡大していくもの」と定義される。
+
+
+
 #### Automatable: Work Your Computer Would Like 
+
+機械にできることであれば自動化できる。人間の判断が必要なものはできない。
+
+
 
 #### Running in Place: Work of No Enduring Value 
 
+ある仕事には価値がない、と考えるのは不快なことかもしれないが、その仕事をしてもServiceが変わらない場合は「永続的な価値がない仕事」とされる。
+
+たとえばDBのバックアップをとってもDBが高速化したり、信頼性を高めるような効果はない。
+
+しかし、永続的な価値はないがバックアップは明らかに必要なタスクになる。
+
+こういったタスクは多くの場合Operatorを適用する範囲になる。
+
+
+
 #### Growing Pains: Work That Expands with the System 
 
+水平スケールするシステムを設計することがあるかもしれない。その時にエンジニアの手によってインスタンスの追加をする場合は自動ではない。
+
+このようなシステムの場合、サービスが10%増えるごとに管理作業も10%増える可能性がある。
+
+
+
+ステートレスなWebサーバを追加する場合、VMを立ち上げ、一意なIPアドレスを割り当て、LBにひもづけるなどすればシステムが拡張できることは確かである。
+
+しかし、この効果はシステムが大きくなるにつれて悪化する。例えば、すでに1000インスタンスが立ち上がっている状態で1台VMを立ち上げても性能向上は微々たるものである。
+
+
+
+代わりにKubernetesでWebサーバをデプロイする場合は、kubectlコマンドを利用するだけでスケールアップおよびスケールダウンを行うことができる。
+
+スケールアップするときにWebサーバ用インスタンスを構成する必要はなく、スケールダウンするときに意図的にIPを買い覇王する必要もない。
+
+Kubernetesがそのような作業を肩代わりして実施してくれる。
+
+
+
 ### Operators: Kubernetes Application Reliability Engineering 
+
+
 
 #### Managing Application State 
 
