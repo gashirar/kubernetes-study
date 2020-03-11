@@ -549,8 +549,6 @@ Operator Frameworkは以下の3つの要素から構成される。
 
 Operatorの考え方はSREからきている。
 
-
-
 ### SRE for Every Application 
 
 SREは展開、運用、および保守タスクを自動化するためのコードを各。SREは他のシステムを実行するためのソフトウェアを作成し、
@@ -610,16 +608,46 @@ Kubernetesがそのような作業を肩代わりして実施してくれる。
 
 
 ### Operators: Kubernetes Application Reliability Engineering 
+OperatorはKubernetesを拡張して、自動化の原理を各アプリケーションに適用することができる。
+独自のクラスタリングの考え方を持ったアプリケーションを考えてみると、
+etcd Operatorは障害時のメンバ交換の時に、エンドポイントと認証をつかって新しいメンバを
+既存クラスタに追加する。
 
+KubernetesのReconsilation LoopはResourceを監視し、望ましい状態にする。
+Operatorによって、このLoopのカスタマイズができる。
 
 
 #### Managing Application State 
+多くの場合、アプリケーションは内部状態を持っており、レプリカ間で同期などを行う必要がある。
 
-#### Golden Signals Sent to Software 
+#### Golden Signals Sent to Software
+- Latency
+  - ある処理にどれくらいの時間がかかっているか
+- Traffic
+  - 時間あたりにどれくらいのHTTP Requestが来ているか
+- Errors
+  - どれくらいのエラーが発生しているが
+- Saturation
+  - リソースがどれくらい使用されているか（ひっ迫しているか）
 
 ### Seven Habits of Highly Successful Operators 
+1. Operatorは1つのDeploymentで管理されること
+
+2. CRDを定義すること
+
+3. 可能な限りKubernetesの標準機能で作ること
+
+4. Operatorの障害が管理対象に影響しないこと
+
+5. 後方互換性を保つこと
+
+6. アップグレードが行える仕組みをつくること
+
+7. Chaos Testingも含めた十分なテストを行うこと
 
 ### Summary 
+Operatorにアプリケーションの配布、デプロイ、および管理を行わせると、アプリケーションがKubernetesの機能を活用できるようになる。
+7つの習慣に従うOperatorで作るべき。
 
 ## 10. Getting Involved
 
